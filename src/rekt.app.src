@@ -1,0 +1,15 @@
+{application, rekt,
+ [{description, "Erlang Record Extender Parse Transform"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
