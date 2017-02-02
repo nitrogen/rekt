@@ -10,8 +10,16 @@
     e,
     {f, 0.1},
     {h, undefined},
-    {zz, "some string", "string()"}
+    {zz, "my dong", "string()"}
 ]}).
+
+%-blah(dfg, dfgd, dg}.
+
+-define(wf_extend(From, To, Module, Fields), -extend({From, To, [{module, Module, "atom()"} | Fields]})).
+
+?wf_extend(testrec1, testrec2, mymod, [j]).
+
+-extend({testrec2, testrec3, []}).
 
 do() ->
     #testrec1{}.

@@ -11,31 +11,55 @@
 %%====================================================================
 
 parse_transform(Forms, _Options) ->
-    Recs = extract_records(Forms),
-    %io:fwrite("Recs: ~p~n",[Recs]),
-    NewForms = replace_extends(Forms, Recs),
-    NewForms.
+    %io:fwrite("Forms: ~p",[Forms]),
+    NewForms = transform_until_done(Forms),
+    FinalForms = replace_unhandled_extends_with_errors(NewForms),
+    %io:fwrite("Final Forms: ~p",[FinalForms]),
+    FinalForms.
+
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+transform_until_done(Forms) ->
+    Recs = extract_records(Forms),
+    NewForms = replace_extends(Forms, Recs),
+    case NewForms==Forms of
+        true -> NewForms;
+        false -> transform_until_done(NewForms)
+    end.
+
+replace_unhandled_extends_with_errors(Forms) ->
+    lists:map(fun
+        ({attribute, LineNum, extend, {SourceRec, _NewRec, _Fields}}) ->
+            ErrMsg = lists:flatten(io_lib:format("rekt: Unable to extend undefined record '~p'", [SourceRec])),
+            {error, {LineNum, erl_parse, ErrMsg}};
+        (Other) ->
+            Other
+    end, Forms).
+
 
 extract_records(Forms) ->
     [Rec || {attribute, _, record, Rec} <- Forms].
 
 replace_extends(Forms, Recs) ->
     lists:map(fun
-        ({attribute, LineNum, extend, {SourceRec, NewRec, Fields}}) ->
-            replace_extend(Recs, LineNum, SourceRec, NewRec, Fields);
+        ({attribute, LineNum, extend, {SourceRec, NewRec, Fields}}=RawFull) ->
+            replace_extend(Recs, LineNum, SourceRec, NewRec, Fields, RawFull);
         (Other) ->
             Other
     end, Forms).
 
-replace_extend(Recs, LineNum, SourceRec, NewRec, Fields) ->
-    {_, OrigFields} = lists:keyfind(SourceRec, 1, Recs),
-    NewFields = [field_to_form(F, LineNum) || F <- Fields],
-    FullFields = merge_fields(OrigFields, NewFields),
-    {attribute, LineNum, record, {NewRec, FullFields}}.
+replace_extend(Recs, LineNum, SourceRec, NewRec, Fields, RawFull) ->
+    case lists:keyfind(SourceRec, 1, Recs) of
+        {_, OrigFields} ->
+            NewFields = [field_to_form(F, LineNum) || F <- Fields],
+            FullFields = merge_fields(OrigFields, NewFields),
+            {attribute, LineNum, record, {NewRec, FullFields}};
+        false ->
+            RawFull
+    end.
     
 field_to_form(Field, LineNum) when is_atom(Field) ->
     {record_field, LineNum, {atom, LineNum, Field}};
