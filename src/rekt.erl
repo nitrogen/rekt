@@ -12,7 +12,7 @@
 
 parse_transform(Forms, _Options) ->
     Recs = extract_records(Forms),
-    io:fwrite("Recs: ~p~n",[Recs]),
+    %io:fwrite("Recs: ~p~n",[Recs]),
     NewForms = replace_extends(Forms, Recs),
     NewForms.
 
@@ -60,7 +60,7 @@ replace_or_append_field(NewField, [CurField|Rest]) ->
     CurFieldName = extract_field_name(CurField),
     case NewFieldName == CurFieldName of
         true ->
-            io:fwrite("Replacing: ~n >>>> ~p~n with~n <<<< ~p~n",[CurField, NewField]),
+            %io:fwrite("Replacing: ~n >>>> ~p~n with~n <<<< ~p~n",[CurField, NewField]),
             [NewField | Rest];
         false ->
             [CurField | replace_or_append_field(NewField, Rest)]
