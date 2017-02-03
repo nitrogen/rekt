@@ -43,17 +43,22 @@ in-line.
 
 Example
 -------
+```erlang
 -module(rekt_sample).
 -compile({parse_transform, rekt}).
 -export([do/0]).
 
-  For example:
-
-```erlang
+%% Create initial record
 -record(rec_1, {a=1, b=2, c=3}).
+
+%% Make new record called #rec_2{}, that is a copy of #rec_1{} with a new field called `y`
 -extend(rec_1, rec_2, [
 	{y, 1000}
 ]).
+
+%% Make a new record called #rec_3{} based on the previously created #rec_2{},
+%% with the `a` field replaced with a new definition (having a default value of
+%% "newthing")
 -extend(rec_2, rec_3, [
 	{a, "newthing"}
 ]).
