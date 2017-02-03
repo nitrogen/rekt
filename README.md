@@ -23,7 +23,12 @@ Usage
 -extend({original_record, new_record, [
 	field1,   %% Just an atom for a field,
     {field2, 2},    %% A field with a default value of 2
-    {field3, [a,b,c]},  %% a field with a default value of [a,b,c]
+    {field3, [a,b,c]},  %% a field with a default value of [a,b,c],
+	{field4, "sometext", "string() | undefined"} %% A field with a default value of
+                                                 %% "sometext", and supports types
+                                                 %% string() and undefined. Note,
+                                                 %% the typedef is the string
+                                                 %% of the typedef
 ]}).
 ```
 
