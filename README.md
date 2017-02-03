@@ -34,9 +34,48 @@ Usage
 
 4) Enjoy being able to create new records from older records.
 
+Notes
+-----
+
+* You can replace fields with new field definitions. The fields will be replaced
+in-line.
+* You can extend previously extended records.
+
+Example
+-------
+-module(rekt_sample).
+-compile({parse_transform, rekt}).
+-export([do/0]).
+
+  For example:
+
+```erlang
+-record(rec_1, {a=1, b=2, c=3}).
+-extend(rec_1, rec_2, [
+	{y, 1000}
+]).
+-extend(rec_2, rec_3, [
+	{a, "newthing"}
+]).
+
+do() ->
+	io:format("Rec_1: ~p~n",[#rec_1{}]),
+	io:format("Rec_2: ~p~n",[#rec_2{}]),
+	io:format("Rec_3: ~p~n",[#rec_3{}]).
+```
+
+Then run:
+
+```erlang
+> rekt_sample:do().
+Rec_1: {rec_1, 1, 2, 3}
+Rec_2: {rec_2, 1, 2, 3, 1000}
+Rec_3: {rec_3, "newthing", 2, 3, 1000}
+ok
+```
 
 License
 -------
-
 Copyright 2017 Jesse Gumm
+
 MIT LICENSE
