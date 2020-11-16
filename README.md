@@ -21,10 +21,10 @@ Usage
 
 ```erlang
 -extend({original_record, new_record, [
-	field1,   %% Just an atom for a field,
+    field1,   %% Just an atom for a field,
     {field2, 2},    %% A field with a default value of 2
     {field3, [a,b,c]},  %% a field with a default value of [a,b,c],
-	{field4, "sometext", "string() | undefined"} %% A field with a default value of
+    {field4, "sometext", "string() | undefined"} %% A field with a default value of
                                                  %% "sometext", and supports types
                                                  %% string() and undefined. Note,
                                                  %% the typedef is the string
@@ -53,20 +53,20 @@ Example
 
 %% Make new record called #rec_2{}, that is a copy of #rec_1{} with a new field called `y`
 -extend({rec_1, rec_2, [
-	{y, 1000}
+    {y, 1000}
 ]}).
 
 %% Make a new record called #rec_3{} based on the previously created #rec_2{},
 %% with the `a` field replaced with a new definition (having a default value of
 %% "newthing")
 -extend({rec_2, rec_3, [
-	{a, "newthing"}
+    {a, "newthing"}
 ]}).
 
 do() ->
-	io:format("Rec_1: ~p~n",[#rec_1{}]),
-	io:format("Rec_2: ~p~n",[#rec_2{}]),
-	io:format("Rec_3: ~p~n",[#rec_3{}]).
+    io:format("Rec_1: ~p~n",[#rec_1{}]),
+    io:format("Rec_2: ~p~n",[#rec_2{}]),
+    io:format("Rec_3: ~p~n",[#rec_3{}]).
 ```
 
 Then run:
