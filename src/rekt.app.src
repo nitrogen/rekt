@@ -7,9 +7,9 @@
     stdlib
    ]},
   {env,[]},
-  {modules, []},
+  {modules, [rekt]},
 
-  {maintainers, []},
-  {licenses, []},
-  {links, []}
+  {maintainers, ["Jesse Gumm"]},
+  {licenses, ["MIT"]},
+  {links, [{"GitHub","http://github.com/nitrogen/rekt"}]}
  ]}.

@@ -81,6 +81,6 @@ ok
 
 License
 -------
-Copyright 2017 Jesse Gumm
+Copyright 2017-2020 Jesse Gumm
 
 MIT LICENSE
