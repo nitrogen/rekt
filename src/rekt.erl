@@ -32,9 +32,10 @@ transform_until_done(Forms) ->
 
 replace_unhandled_extends_with_errors(Forms) ->
     lists:map(fun
-        ({attribute, LineNum, extend, {SourceRec, _NewRec, _Fields}}) ->
+        ({attribute, Anno, extend, {SourceRec, _NewRec, _Fields}}) ->
             ErrMsg = lists:flatten(io_lib:format("rekt: Unable to extend undefined record '~p'", [SourceRec])),
-            {error, {LineNum, erl_parse, ErrMsg}};
+            Location = erl_anno:location(Anno),
+            {error, {Location, erl_parse, ErrMsg}};
         (Other) ->
             Other
     end, Forms).
@@ -45,30 +46,32 @@ extract_records(Forms) ->
 
 replace_extends(Forms, Recs) ->
     lists:map(fun
-        ({attribute, LineNum, extend, {SourceRec, NewRec, Fields}}=RawFull) ->
-            replace_extend(Recs, LineNum, SourceRec, NewRec, Fields, RawFull);
+        ({attribute, Anno, extend, {SourceRec, NewRec, Fields}}=RawFull) ->
+            replace_extend(Recs, Anno, SourceRec, NewRec, Fields, RawFull);
         (Other) ->
             Other
     end, Forms).
 
-replace_extend(Recs, LineNum, SourceRec, NewRec, Fields, RawFull) ->
+replace_extend(Recs, Anno, SourceRec, NewRec, Fields, RawFull) ->
     case lists:keyfind(SourceRec, 1, Recs) of
         {_, OrigFields} ->
-            NewFields = [field_to_form(F, LineNum) || F <- Fields],
+            NewFields = [field_to_form(F, Anno) || F <- Fields],
             FullFields = merge_fields(OrigFields, NewFields),
-            {attribute, LineNum, record, {NewRec, FullFields}};
+            {attribute, Anno, record, {NewRec, FullFields}};
         false ->
             RawFull
     end.
     
-field_to_form(Field, LineNum) when is_atom(Field) ->
-    {record_field, LineNum, {atom, LineNum, Field}};
-field_to_form({Field, Value}, LineNum) when is_atom(Field) ->
+field_to_form(Field, Anno) when is_atom(Field) ->
+    {record_field, Anno, {atom, Anno, Field}};
+field_to_form({Field, Value}, Anno) when is_atom(Field) ->
+    LineNum = erl_anno:line(Anno),
     FormattedValue = erl_parse:abstract(Value, [{line, LineNum}]),
-    {record_field, LineNum, {atom, LineNum, Field}, FormattedValue};
-field_to_form({Field, Value, TypeStr}, LineNum) ->
+    {record_field, Anno, {atom, Anno, Field}, FormattedValue};
+field_to_form({Field, Value, TypeStr}, Anno) ->
     %% Types not implemented yet
     Str = lists:flatten(io_lib:format("-record(a, {~p=~p :: ~s}).", [Field, Value, TypeStr])),
+    LineNum = erl_anno:location(Anno),
     {attribute, _, record, {_Name, [FieldDef]}} = merl:quote(LineNum, Str),
     FieldDef.
 
